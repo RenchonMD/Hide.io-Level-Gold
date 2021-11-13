@@ -73,8 +73,7 @@ void *hack_thread(void *) {
     // ARM64 assembly exampleh 
     // MOV X0, #0x0 = 00 00 80 D2
     // RET = C0 03 5F D6
-	  										                                 
-     
+	  										                                    
     HOOK_LIB("libil2cpp.so", "0x123456", get_IntGold, old_get_IntGold);
     
     HOOK_LIB("libil2cpp.so", "0x123456", get_IntLevel, old_get_IntLevel);
@@ -109,8 +108,7 @@ Java_uk_lgl_modmenu_FloatingModMenuService_getFeatureList(JNIEnv *env, jobject c
     
     const char *features[] = {          
     　      OBFUSCATE("0_InputValue_レベル変更"),//Max value
-         　 OBFUSCATE("1_CheckBox_無制限のコイン"),
-            
+         　 OBFUSCATE("1_CheckBox_無制限のコイン"),           
     };
 
     //Now you dont have to manually update the number everytime;
