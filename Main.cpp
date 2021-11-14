@@ -15,24 +15,17 @@
 #include "KittyMemory/MemoryPatch.h"
 #include "Menu.h"
 
-//Target lib here
 #define targetLibName OBFUSCATE("libil2cpp.so")
 
 #include "Includes/Macros.h"
 
-// fancy struct for patches for kittyMemory
 struct My_Patches {
-    // let's assume we have patches for these functions for whatever game
-    // like show in miniMap boolean function 
     MemoryPatch GodMode, GodMode2;
-    // etc...
 } hexPatches;
 
 bool feature1 = false, feature2 = false, goldhack = false;
 int sliderValue = 1, level = 0;
 void *instanceBtn;
-
-// Hooking examples. Assuming you know how to write hook
 
 
 int (*old_get_IntGold)(void *instance);
@@ -51,28 +44,17 @@ int get_IntLevel(void *instance) {
     return old_get_IntLevel(instance);
 }
 
-// we will run our hacks in a new thread so our while loop doesn't block process main thread
+
 void *hack_thread(void *) {
     LOGI(OBFUSCATE("pthread created"));
 
-    //Check if target lib is loaded
     do {
         sleep(1);
     } while (!isLibraryLoaded(targetLibName));
 
-    //Anti-lib rename
-    /*
-    do {
-        sleep(1);
-    } while (!isLibraryLoaded("libYOURNAME.so"));*/
-
     LOGI(OBFUSCATE("%s has been loaded"), (const char *) targetLibName);
 
-#if defined(__aarch64__) //To compile this code for arm64 lib only. Do not worry about greyed out highlighting code, it still works
-    // New way to patch hex via KittyMemory without need to  specify len. Spaces or without spaces are fine
-    // ARM64 assembly exampleh 
-    // MOV X0, #0x0 = 00 00 80 D2
-    // RET = C0 03 5F D6
+#if defined(__aarch64__) 
 	  										                                    
     HOOK_LIB("libil2cpp.so", "0x123456", get_IntGold, old_get_IntGold);
     
@@ -88,30 +70,19 @@ void *hack_thread(void *) {
     return NULL;
 }
 
-//JNI calls
 extern "C" {
 
-// Do not change or translate the first text unless you know what you are doing
-// Assigning feature numbers is optional. Without it, it will automatically count for you, starting from 0
-// Assigned feature numbers can be like any numbers 1,3,200,10... instead in order 0,1,2,3,4,5...
-// ButtonLink, Category, RichTextView and RichWebView is not counted. They can't have feature number assigned
-// Toggle, ButtonOnOff and Checkbox can be switched on by default, if you add True_. Example: CheckBox_True_The Check Box
-// To learn HTML, go to this page: https://www.w3schools.com/
 
 JNIEXPORT jobjectArray
 JNICALL
 Java_uk_lgl_modmenu_FloatingModMenuService_getFeatureList(JNIEnv *env, jobject context) {
     jobjectArray ret;
-
-    //Toasts added here so it's harder to remove it
-    //MakeToast(env, context, OBFUSCATE("Renchon Mod"), Toast::LENGTH_LONG);
     
     const char *features[] = {          
     　      OBFUSCATE("0_InputValue_レベル変更"),//Max value
          　 OBFUSCATE("1_CheckBox_無制限のコイン"),           
     };
 
-    //Now you dont have to manually update the number everytime;
     int Total_Feature = (sizeof features / sizeof features[0]);
     ret = (jobjectArray)
             env->NewObjectArray(Total_Feature, env->FindClass(OBFUSCATE("java/lang/String")),
@@ -135,8 +106,6 @@ Java_uk_lgl_modmenu_Preferences_Changes(JNIEnv *env, jclass clazz, jobject obj,
          env->GetStringUTFChars(featName, 0), value,
          boolean, str != NULL ? env->GetStringUTFChars(str, 0) : "");
 
-    //BE CAREFUL NOT TO ACCIDENTLY REMOVE break;
-
     switch (featNum) {
         case 0:
             level = value;           
@@ -148,11 +117,8 @@ Java_uk_lgl_modmenu_Preferences_Changes(JNIEnv *env, jclass clazz, jobject obj,
 }
 }
 
-//No need to use JNI_OnLoad, since we don't use JNIEnv
-//We do this to hide OnLoad from disassembler
 __attribute__((constructor))
 void lib_main() {
-    // Create a new thread so it does not block the main thread, means the game would not freeze
     pthread_t ptid;
     pthread_create(&ptid, NULL, hack_thread, NULL);
 }
