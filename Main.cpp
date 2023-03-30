@@ -23,15 +23,15 @@ struct My_Patches {
     MemoryPatch GodMode, GodMode2;
 } hexPatches;
 
-bool feature1 = false, feature2 = false, goldhack = false;
-int sliderValue = 1, level = 0;
+bool goldhack = false;
+int level = 0;
 void *instanceBtn;
 
 
 int (*old_get_IntGold)(void *instance);
 int get_IntGold(void *instance) {
     if (instance != NULL && goldhack) {
-        return 10000;
+        return 999999999;
     }
     return old_get_IntGold(instance);
 }
@@ -80,7 +80,7 @@ Java_uk_lgl_modmenu_FloatingModMenuService_getFeatureList(JNIEnv *env, jobject c
     
     const char *features[] = {          
     　      OBFUSCATE("0_InputValue_レベル変更"),//Max value
-         　 OBFUSCATE("1_CheckBox_無制限のコイン"),           
+         　 OBFUSCATE("1_Toggle_無制限のコイン"),           
     };
 
     int Total_Feature = (sizeof features / sizeof features[0]);
